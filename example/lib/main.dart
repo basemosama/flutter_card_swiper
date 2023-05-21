@@ -48,6 +48,9 @@ class _ExamplePageState extends State<Example> {
                 backCardOffset: const Offset(40, 40),
                 padding: const EdgeInsets.all(24.0),
                 cardBuilder: (context, index) => cards[index],
+                onDragUpdate: (index, direction) {
+                  print('on Drag update : $index, $direction');
+                },
               ),
             ),
             Padding(

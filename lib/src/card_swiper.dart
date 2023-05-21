@@ -133,6 +133,8 @@ class CardSwiper extends StatefulWidget {
   /// Must be a positive value. Defaults to Offset(0, 40).
   final Offset backCardOffset;
 
+  final Function(int? index, CardSwiperDirection direction)? onDragUpdate;
+
   const CardSwiper({
     Key? key,
     required this.cardBuilder,
@@ -158,6 +160,7 @@ class CardSwiper extends StatefulWidget {
     this.numberOfCardsDisplayed = 2,
     this.onUndo,
     this.backCardOffset = const Offset(0, 40),
+    this.onDragUpdate,
   })  : assert(
           maxAngle >= 0 && maxAngle <= 360,
           'maxAngle must be between 0 and 360',
@@ -292,6 +295,17 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
         },
         onPanUpdate: (tapInfo) {
           if (!widget.isDisabled) {
+            if (_cardAnimation.left.abs() > _cardAnimation.top.abs()) {
+              final direction = _cardAnimation.left.isNegative
+                  ? CardSwiperDirection.left
+                  : CardSwiperDirection.right;
+              widget.onDragUpdate?.call(_currentIndex, direction);
+            } else {
+              final direction = _cardAnimation.top.isNegative
+                  ? CardSwiperDirection.top
+                  : CardSwiperDirection.bottom;
+              widget.onDragUpdate?.call(_currentIndex, direction);
+            }
             setState(
               () => _cardAnimation.update(
                 tapInfo.delta.dx,
