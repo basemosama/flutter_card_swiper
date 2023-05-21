@@ -42,7 +42,7 @@ class _ExamplePageState extends State<Example> {
               child: CardSwiper(
                 controller: controller,
                 cardsCount: cards.length,
-                onSwipe: _onSwipe,
+                onSwipeWillMoveToNext: _onSwipe,
                 onUndo: _onUndo,
                 numberOfCardsDisplayed: 3,
                 backCardOffset: const Offset(40, 40),

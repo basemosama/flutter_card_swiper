@@ -249,7 +249,7 @@ void main() {
           cardsCount: 10,
           numberOfCardsDisplayed: 1,
           cardBuilder: genericBuilder,
-          onSwipe: (oldIndex, currentIndex, direction) {
+          onSwipeWillMoveToNext: (oldIndex, currentIndex, direction) {
             isCalled = true;
             return true;
           },
@@ -273,7 +273,7 @@ void main() {
           cardsCount: 10,
           numberOfCardsDisplayed: 1,
           cardBuilder: genericBuilder,
-          onSwipe: (oldIndex, currentIndex, direction) {
+          onSwipeWillMoveToNext: (oldIndex, currentIndex, direction) {
             return false;
           },
         ),
@@ -297,7 +297,7 @@ void main() {
           cardsCount: 10,
           numberOfCardsDisplayed: 1,
           cardBuilder: genericBuilder,
-          onSwipe: (oldIndex, currentIndex, swipeDirection) {
+          onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
             directions.add(swipeDirection);
             return true;
           },
@@ -337,7 +337,7 @@ void main() {
           cardsCount: 3,
           numberOfCardsDisplayed: 1,
           cardBuilder: genericBuilder,
-          onSwipe: (oldIndex, currentIndex, swipeDirection) {
+          onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
             oldIndexes.add(oldIndex);
             newIndexes.add(currentIndex);
             return true;
@@ -374,7 +374,7 @@ void main() {
           cardsCount: 3,
           numberOfCardsDisplayed: 1,
           cardBuilder: genericBuilder,
-          onSwipe: (oldIndex, currentIndex, swipeDirection) {
+          onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
             oldIndexes.add(oldIndex);
             newIndexes.add(currentIndex);
             return true;

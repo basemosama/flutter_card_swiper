@@ -57,7 +57,7 @@ void main() {
               cardsCount: 10,
               cardBuilder: genericBuilder,
               direction: CardSwiperDirection.top,
-              onSwipe: (oldIndex, currentIndex, swipeDirection) {
+              onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
                 direction = swipeDirection;
                 return true;
               },
@@ -82,7 +82,7 @@ void main() {
               cardsCount: 10,
               cardBuilder: genericBuilder,
               direction: CardSwiperDirection.left,
-              onSwipe: (oldIndex, currentIndex, swipeDirection) {
+              onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
                 direction = swipeDirection;
                 return true;
               },
@@ -106,7 +106,7 @@ void main() {
               controller: controller,
               cardsCount: 10,
               cardBuilder: genericBuilder,
-              onSwipe: (oldIndex, currentIndex, swipeDirection) {
+              onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
                 direction = swipeDirection;
                 return true;
               },
@@ -131,7 +131,7 @@ void main() {
               cardsCount: 10,
               cardBuilder: genericBuilder,
               direction: CardSwiperDirection.top,
-              onSwipe: (oldIndex, currentIndex, swipeDirection) {
+              onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
                 direction = swipeDirection;
                 return true;
               },
@@ -156,7 +156,7 @@ void main() {
               cardsCount: 10,
               cardBuilder: genericBuilder,
               direction: CardSwiperDirection.bottom,
-              onSwipe: (oldIndex, currentIndex, swipeDirection) {
+              onSwipeWillMoveToNext: (oldIndex, currentIndex, swipeDirection) {
                 direction = swipeDirection;
                 return true;
               },
