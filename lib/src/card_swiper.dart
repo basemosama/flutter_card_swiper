@@ -143,35 +143,39 @@ class CardSwiper extends StatefulWidget {
   ///Determines whether swiping to left return to previous card.
   final bool shouldRewindOnLeftSwipe;
 
-  const CardSwiper({
-    Key? key,
-    required this.cardBuilder,
-    required this.cardsCount,
-    this.controller,
-    this.initialIndex = 0,
-    this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-    this.duration = const Duration(milliseconds: 200),
-    this.maxAngle = 30,
-    this.threshold = 50,
-    this.scale = 0.9,
-    this.isDisabled = false,
-    this.onTapDisabled,
-    this.onSwipeWillMoveToNext,
-    this.onSwiped,
-    this.onEnd,
-    this.direction = CardSwiperDirection.right,
-    @Deprecated('Will be deprecated in the next major release. Use [allowedSwipeDirection] instead')
-        this.isHorizontalSwipingEnabled = true,
-    @Deprecated('Will be deprecated in the next major release. Use [allowedSwipeDirection] instead')
-        this.isVerticalSwipingEnabled = true,
-    this.allowedSwipeDirection = const AllowedSwipeDirection.all(),
-    this.isLoop = true,
-    this.numberOfCardsDisplayed = 2,
-    this.onUndo,
-    this.backCardOffset = const Offset(0, 40),
-    this.onDragUpdate,
-    this.shouldRewindOnLeftSwipe = false,
-  })  : assert(
+  /// Updates back card with previous card or next card while swiping.
+  final bool shouldUpdateBackWhenRewindOnLeftSwipeEnabled;
+
+  const CardSwiper(
+      {Key? key,
+      required this.cardBuilder,
+      required this.cardsCount,
+      this.controller,
+      this.initialIndex = 0,
+      this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+      this.duration = const Duration(milliseconds: 200),
+      this.maxAngle = 30,
+      this.threshold = 50,
+      this.scale = 0.9,
+      this.isDisabled = false,
+      this.onTapDisabled,
+      this.onSwipeWillMoveToNext,
+      this.onSwiped,
+      this.onEnd,
+      this.direction = CardSwiperDirection.right,
+      @Deprecated('Will be deprecated in the next major release. Use [allowedSwipeDirection] instead')
+          this.isHorizontalSwipingEnabled = true,
+      @Deprecated('Will be deprecated in the next major release. Use [allowedSwipeDirection] instead')
+          this.isVerticalSwipingEnabled = true,
+      this.allowedSwipeDirection = const AllowedSwipeDirection.all(),
+      this.isLoop = true,
+      this.numberOfCardsDisplayed = 2,
+      this.onUndo,
+      this.backCardOffset = const Offset(0, 40),
+      this.onDragUpdate,
+      this.shouldRewindOnLeftSwipe = false,
+      this.shouldUpdateBackWhenRewindOnLeftSwipeEnabled = false})
+      : assert(
           maxAngle >= 0 && maxAngle <= 360,
           'maxAngle must be between 0 and 360',
         ),
@@ -350,7 +354,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
           child: widget.cardBuilder(
             context,
             getValidIndexOffset(
-              widget.shouldRewindOnLeftSwipe
+              widget.shouldUpdateBackWhenRewindOnLeftSwipeEnabled
                   ? _lastDetectedDirection == CardSwiperDirection.left
                       ? (index - 2)
                       : index
@@ -411,13 +415,13 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     }
 
     final previousIndex = _currentIndex;
-    final index = getValidIndexOffset(
-      widget.shouldRewindOnLeftSwipe
-          ? _detectedDirection == CardSwiperDirection.left
-              ? -1
-              : 0
-          : 0,
-    );
+    final index = widget.shouldRewindOnLeftSwipe
+        ? _detectedDirection == CardSwiperDirection.left
+            ? getValidIndexOffset(-1)
+            : _nextIndex
+        : _nextIndex;
+    print(
+        'complete swipe direction ${_detectedDirection} , last detected :$_lastDetectedDirection index $_currentIndex , index :$index');
 
     _undoableIndex.state = index;
     _directionHistory.add(_detectedDirection);
@@ -425,7 +429,9 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     if (isLastCard) {
       widget.onEnd?.call();
     }
-    widget.onSwiped?.call(previousIndex!, _nextIndex, _detectedDirection);
+    if (index != null) {
+      await widget.onSwiped?.call(previousIndex!, index!, _detectedDirection);
+    }
   }
 
   void _reset() {

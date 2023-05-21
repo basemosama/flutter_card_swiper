@@ -8,9 +8,9 @@ typedef CardSwiperOnSwipeWillMoveToNext = FutureOr<bool> Function(
   CardSwiperDirection direction,
 );
 
-typedef CardSwiperOnSwiped = FutureOr<bool> Function(
+typedef CardSwiperOnSwiped = Future<void> Function(
   int previousIndex,
-  int? currentIndex,
+  int currentIndex,
   CardSwiperDirection direction,
 );
 
