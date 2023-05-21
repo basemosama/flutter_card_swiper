@@ -51,6 +51,7 @@ class _ExamplePageState extends State<Example> {
                 onDragUpdate: (index, direction) {
                   print('on Drag update : $index, $direction');
                 },
+                shouldRewindOnLeftSwipe: true,
               ),
             ),
             Padding(

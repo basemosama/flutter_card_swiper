@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_card_swiper/src/allowed_swipe_direction.dart';
 import 'package:flutter_card_swiper/src/card_animation.dart';
@@ -136,7 +137,11 @@ class CardSwiper extends StatefulWidget {
   /// Must be a positive value. Defaults to Offset(0, 40).
   final Offset backCardOffset;
 
+  ///Callback to notify when the card has been dragged.
   final Function(int? index, CardSwiperDirection direction)? onDragUpdate;
+
+  ///Determines whether swiping to left return to previous card.
+  final bool shouldRewindOnLeftSwipe;
 
   const CardSwiper({
     Key? key,
@@ -165,6 +170,7 @@ class CardSwiper extends StatefulWidget {
     this.onUndo,
     this.backCardOffset = const Offset(0, 40),
     this.onDragUpdate,
+    this.shouldRewindOnLeftSwipe = false,
   })  : assert(
           maxAngle >= 0 && maxAngle <= 360,
           'maxAngle must be between 0 and 360',
@@ -212,6 +218,8 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
   int? get _nextIndex => getValidIndexOffset(1);
 
   bool get _canSwipe => _currentIndex != null && !widget.isDisabled;
+
+  CardSwiperDirection _lastDetectedDirection = CardSwiperDirection.none;
 
   @override
   void initState() {
@@ -304,11 +312,13 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
                   ? CardSwiperDirection.left
                   : CardSwiperDirection.right;
               widget.onDragUpdate?.call(_currentIndex, direction);
+              _lastDetectedDirection = direction;
             } else {
               final direction = _cardAnimation.top.isNegative
                   ? CardSwiperDirection.top
                   : CardSwiperDirection.bottom;
               widget.onDragUpdate?.call(_currentIndex, direction);
+              _lastDetectedDirection = direction;
             }
             setState(
               () => _cardAnimation.update(
@@ -337,7 +347,16 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
         scale: _cardAnimation.scale - ((1 - widget.scale) * (index - 1)),
         child: ConstrainedBox(
           constraints: constraints,
-          child: widget.cardBuilder(context, getValidIndexOffset(index)!),
+          child: widget.cardBuilder(
+            context,
+            getValidIndexOffset(
+              widget.shouldRewindOnLeftSwipe
+                  ? _lastDetectedDirection == CardSwiperDirection.left
+                      ? (index - 2)
+                      : index
+                  : index,
+            )!,
+          ),
         ),
       ),
     );
@@ -377,7 +396,6 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
         default:
           break;
       }
-
       _reset();
     }
   }
@@ -393,7 +411,15 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     }
 
     final previousIndex = _currentIndex;
-    _undoableIndex.state = _nextIndex;
+    final index = getValidIndexOffset(
+      widget.shouldRewindOnLeftSwipe
+          ? _detectedDirection == CardSwiperDirection.left
+              ? -1
+              : 0
+          : 0,
+    );
+
+    _undoableIndex.state = index;
     _directionHistory.add(_detectedDirection);
 
     if (isLastCard) {
@@ -420,7 +446,9 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
           direction == CardSwiperDirection.right &&
               widget.allowedSwipeDirection.right) {
         _swipe(direction);
+        _lastDetectedDirection = direction;
       } else {
+        _lastDetectedDirection = CardSwiperDirection.none;
         _goBack();
       }
     } else if (_cardAnimation.top.abs() > widget.threshold) {
@@ -431,11 +459,14 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
               widget.allowedSwipeDirection.up ||
           direction == CardSwiperDirection.bottom &&
               widget.allowedSwipeDirection.down) {
+        _lastDetectedDirection = direction;
         _swipe(direction);
       } else {
+        _lastDetectedDirection = CardSwiperDirection.none;
         _goBack();
       }
     } else {
+      _lastDetectedDirection = CardSwiperDirection.none;
       _goBack();
     }
   }
