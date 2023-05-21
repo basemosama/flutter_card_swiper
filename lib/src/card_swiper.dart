@@ -144,7 +144,7 @@ class CardSwiper extends StatefulWidget {
   final bool shouldRewindOnLeftSwipe;
 
   /// Updates back card with previous card or next card while swiping.
-  final bool shouldUpdateBackWhenRewindOnLeftSwipeEnabled;
+  final bool shouldRewindBackOnLeftSwipe;
 
   const CardSwiper(
       {Key? key,
@@ -174,7 +174,7 @@ class CardSwiper extends StatefulWidget {
       this.backCardOffset = const Offset(0, 40),
       this.onDragUpdate,
       this.shouldRewindOnLeftSwipe = false,
-      this.shouldUpdateBackWhenRewindOnLeftSwipeEnabled = false})
+      this.shouldRewindBackOnLeftSwipe = false})
       : assert(
           maxAngle >= 0 && maxAngle <= 360,
           'maxAngle must be between 0 and 360',
@@ -354,7 +354,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
           child: widget.cardBuilder(
             context,
             getValidIndexOffset(
-              widget.shouldUpdateBackWhenRewindOnLeftSwipeEnabled
+              widget.shouldRewindBackOnLeftSwipe
                   ? _lastDetectedDirection == CardSwiperDirection.left
                       ? (index - 2)
                       : index
