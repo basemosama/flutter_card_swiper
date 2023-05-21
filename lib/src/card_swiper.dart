@@ -79,7 +79,10 @@ class CardSwiper extends StatefulWidget {
   /// The function is called with the oldIndex, the currentIndex and the direction of the swipe.
   /// If the function returns `false`, the swipe action is canceled and the current card remains
   /// on top of the stack. If the function returns `true`, the swipe action is performed as expected.
-  final CardSwiperOnSwipe? onSwipe;
+  final CardSwiperOnSwipeWillMoveToNext? onSwipeWillMoveToNext;
+
+  /// Callback function that is called when is swiped.
+  final CardSwiperOnSwiped? onSwiped;
 
   /// Callback function that is called when there are no more cards to swipe.
   final CardSwiperOnEnd? onEnd;
@@ -148,7 +151,8 @@ class CardSwiper extends StatefulWidget {
     this.scale = 0.9,
     this.isDisabled = false,
     this.onTapDisabled,
-    this.onSwipe,
+    this.onSwipeWillMoveToNext,
+    this.onSwiped,
     this.onEnd,
     this.direction = CardSwiperDirection.right,
     @Deprecated('Will be deprecated in the next major release. Use [allowedSwipeDirection] instead')
@@ -380,7 +384,7 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
 
   Future<void> _handleCompleteSwipe() async {
     final isLastCard = _currentIndex! == widget.cardsCount - 1;
-    final shouldCancelSwipe = await widget.onSwipe
+    final shouldCancelSwipe = await widget.onSwipeWillMoveToNext
             ?.call(_currentIndex!, _nextIndex, _detectedDirection) ==
         false;
 
@@ -388,12 +392,14 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
       return;
     }
 
+    final previousIndex = _currentIndex;
     _undoableIndex.state = _nextIndex;
     _directionHistory.add(_detectedDirection);
 
     if (isLastCard) {
       widget.onEnd?.call();
     }
+    widget.onSwiped?.call(previousIndex!, _nextIndex, _detectedDirection);
   }
 
   void _reset() {
