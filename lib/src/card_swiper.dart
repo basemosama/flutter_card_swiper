@@ -420,8 +420,6 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
             ? getValidIndexOffset(-1)
             : _nextIndex
         : _nextIndex;
-    print(
-        'complete swipe direction ${_detectedDirection} , last detected :$_lastDetectedDirection index $_currentIndex , index :$index');
 
     _undoableIndex.state = index;
     _directionHistory.add(_detectedDirection);
@@ -429,8 +427,9 @@ class _CardSwiperState<T extends Widget> extends State<CardSwiper>
     if (isLastCard) {
       widget.onEnd?.call();
     }
+
     if (index != null) {
-      await widget.onSwiped?.call(previousIndex!, index!, _detectedDirection);
+      await widget.onSwiped?.call(previousIndex!, index, _detectedDirection);
     }
   }
 
